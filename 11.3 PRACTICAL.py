@@ -61,6 +61,7 @@ plt.xlabel("Longitude")
 plt.ylabel("Latitude")
 plt.tight_layout()
 plt.savefig("C:\\Users\\zheng\\Desktop\\EV228\\PART3_ERA5_10mwind.png", dpi=300, bbox_inches='tight', pad_inches=0.1)
+
 plt.show()
 
 
