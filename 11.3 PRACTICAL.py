@@ -55,13 +55,12 @@ wind_var=list(PART3.data_vars)[0]
 wind_mean=PART3[wind_var].mean(dim='valid_time', skipna=True)
 
 plt.figure(figsize=(10, 6))
-wind_mean.plot(cmap='coolwarm', cbar_kwargs={'label': '10m Wind Speed'})
-plt.title("Time-Averaged 10m Wind Speed", fontsize=14)
+wind_mean.plot(cmap='coolwarm', cbar_kwargs={'label': '10m Wind Speed/Si10'})
+plt.title("Time-Averaged Wind Speed", fontsize=14)
 plt.xlabel("Longitude")
 plt.ylabel("Latitude")
 plt.tight_layout()
 plt.savefig("C:\\Users\\zheng\\Desktop\\EV228\\PART3_ERA5_10mwind.png", dpi=300, bbox_inches='tight', pad_inches=0.1)
-
 plt.show()
 
 
