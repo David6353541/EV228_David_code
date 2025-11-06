@@ -27,12 +27,12 @@ print("\nEVS1 Info (with NaN kept)")
 print(EVS1.info())
 
 
-EVS1['DATE'] = pd.to_datetime(EVS1['DATE'])
+EVS1['DATE']=pd.to_datetime(EVS1['DATE'])
 
 # Monthly average PRCP changing trend 
 df1=EVS1[EVS1['DATE'] >= '1951-01-01'].copy()   
 df1.set_index('DATE', inplace=True)
-monthly_prcp = df1['PRCP'].resample('M').mean()
+monthly_prcp=df1['PRCP'].resample('M').mean()
 
 plt.figure(figsize=(12, 6))
 plt.plot(monthly_prcp.index, monthly_prcp.values, color='blue', linewidth=1.3)
@@ -45,17 +45,17 @@ plt.show()
 
 
 # PRCP trend in 2025
-df2=EVS1[(EVS1['DATE'] >= '2025-01-01') & (EVS1['DATE'] <= '2025-9-01')].copy()
-df2['RollingMean'] = df2['PRCP'].rolling(window=30, min_periods=1).mean()
-df2['RollingStd'] = df2['PRCP'].rolling(window=30, min_periods=1).std()
+df2=EVS1[(EVS1['DATE'] >= '2025-01-01')&(EVS1['DATE'] <= '2025-9-01')].copy()
+df2['RollingMean']=df2['PRCP'].rolling(window=30, min_periods=1).mean()
+df2['RollingStd']=df2['PRCP'].rolling(window=30, min_periods=1).std()
 
 
 # find anomaly threshold (mean ± 2*std)
-upper_threshold = df2['RollingMean'] + 2 * df2['RollingStd']
-lower_threshold = df2['RollingMean'] - 2 * df2['RollingStd']
+upper_threshold=df2['RollingMean']+2*df2['RollingStd']
+lower_threshold=df2['RollingMean']-2*df2['RollingStd']
 
 # Identify anomalies
-anomalies = df2[(df2['PRCP'] > upper_threshold) | (df2['PRCP'] < lower_threshold)]
+anomalies=df2[(df2['PRCP'] > upper_threshold) | (df2['PRCP'] < lower_threshold)]
 
 print(f"Detected {len(anomalies)} anomalies")
 

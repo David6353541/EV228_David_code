@@ -8,7 +8,6 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy
 from scipy.stats import pearsonr
 import matplotlib.gridspec as gridspec
 import cartopy.crs as ccrs
@@ -20,11 +19,11 @@ import cartopy.crs as ccrs
 
 
 '''set the output directory'''
-output_dir = r"C:\Users\zheng\Desktop\EV228"
+output_dir=r"C:\Users\zheng\Desktop\EV228"
 os.chdir(output_dir)
 
 
-'''import the data from 3 northern city'''
+'''import the data'''
 os.chdir(r'C:\\Users\\zheng\\Desktop\\EV228')
 
 EVS1=pd.read_csv(r"C:\\Users\\zheng\\Desktop\\EV228\\CHM00054511.csv") #Beijing
@@ -38,12 +37,12 @@ print(EVS2.head())
 print(EVS2.columns)
 print(EVS3.head())
 print(EVS3.columns)
-
 '''check the data'''
 pd.set_option('display.max_rows', 20)       
 pd.set_option('display.max_columns', None)    
 pd.set_option('display.width', None)          
 pd.set_option('display.max_colwidth', None)   
+
 
 print("\nEVS1 Preview:")
 print(EVS1.head())
@@ -108,37 +107,37 @@ plt.show()
 
 
 '''PRCP trend in 2025'''
-dfA=EVS1[(EVS1['DATE'] >= '2025-01-01')&(EVS1['DATE'] <= '2025-9-01')].copy()
+dfA=EVS1[(EVS1['DATE'] >= '2025-01-01') & (EVS1['DATE'] <= '2025-9-01')].copy()
 dfA['RollingMean']=dfA['PRCP'].rolling(window=30, min_periods=1).mean()
 dfA['RollingStd']=dfA['PRCP'].rolling(window=30, min_periods=1).std()
 
-dfB=EVS2[(EVS2['DATE'] >= '2025-01-01')&(EVS2['DATE'] <= '2025-9-01')].copy()
+dfB=EVS2[(EVS2['DATE'] >= '2025-01-01') & (EVS2['DATE'] <= '2025-9-01')].copy()
 dfB['RollingMean']=dfB['PRCP'].rolling(window=30, min_periods=1).mean()
 dfB['RollingStd']=dfB['PRCP'].rolling(window=30, min_periods=1).std()
 
-dfC=EVS3[(EVS3['DATE'] >= '2025-01-01')&(EVS3['DATE'] <= '2025-9-01')].copy()
+dfC=EVS3[(EVS3['DATE'] >= '2025-01-01') & (EVS3['DATE'] <= '2025-9-01')].copy()
 dfC['RollingMean']=dfC['PRCP'].rolling(window=30, min_periods=1).mean()
 dfC['RollingStd']=dfC['PRCP'].rolling(window=30, min_periods=1).std()
 
 
 '''find anomaly threshold (mean ± 2*std)'''
-upper_threshold=dfA['RollingMean']+2*dfA['RollingStd']
-lower_threshold=dfA['RollingMean']-2*dfA['RollingStd']
+upper_threshold=dfA['RollingMean'] + 2 * dfA['RollingStd']
+lower_threshold=dfA['RollingMean'] - 2 * dfA['RollingStd']
 
-upper_threshold1=dfB['RollingMean']+2*dfB['RollingStd']
-lower_threshold1=dfB['RollingMean']-2*dfB['RollingStd']
+upper_threshold1=dfB['RollingMean'] + 2 * dfB['RollingStd']
+lower_threshold1=dfB['RollingMean'] - 2 * dfB['RollingStd']
 
-upper_threshold2=dfC['RollingMean']+2*dfC['RollingStd']
-lower_threshold2=dfC['RollingMean']-2*dfC['RollingStd']
+upper_threshold2=dfC['RollingMean'] + 2 * dfC['RollingStd']
+lower_threshold2=dfC['RollingMean'] - 2 * dfC['RollingStd']
 
-dfA['Upper_Threshold']=dfA['RollingMean']+2*dfA['RollingStd']
-dfA['Lower_Threshold']=dfA['RollingMean']-2*dfA['RollingStd']
+dfA['Upper_Threshold']=dfA['RollingMean'] + 2 * dfA['RollingStd']
+dfA['Lower_Threshold']=dfA['RollingMean'] - 2 * dfA['RollingStd']
 
-dfB['Upper_Threshold']=dfB['RollingMean']+2*dfB['RollingStd']
-dfB['Lower_Threshold']=dfB['RollingMean']-2*dfB['RollingStd']
+dfB['Upper_Threshold']=dfB['RollingMean'] + 2 * dfB['RollingStd']
+dfB['Lower_Threshold']=dfB['RollingMean'] - 2 * dfB['RollingStd']
 
-dfC['Upper_Threshold']=dfC['RollingMean']+2*dfC['RollingStd']
-dfC['Lower_Threshold']=dfC['RollingMean']-2*dfC['RollingStd']
+dfC['Upper_Threshold']=dfC['RollingMean'] + 2 * dfC['RollingStd']
+dfC['Lower_Threshold']=dfC['RollingMean'] - 2 * dfC['RollingStd']
 
 '''Identify anomalies'''
 anomalies_A=dfA[(dfA['PRCP'] > dfA['Upper_Threshold']) | (dfA['PRCP'] < dfA['Lower_Threshold'])]
@@ -149,11 +148,6 @@ print(f"Detected {len(anomalies_B)} anomalies in Shijiazhuang")
 
 anomalies_C=dfC[(dfC['PRCP'] > dfC['Upper_Threshold']) | (dfC['PRCP'] < dfC['Lower_Threshold'])]
 print(f"Detected {len(anomalies_C)} anomalies in Chengde")
-
-
-
-
-
 
 '''Plot Beijing 2025 PRCP data'''
 plt.figure(figsize=(12, 6))
@@ -200,10 +194,7 @@ plt.tight_layout()
 plt.show()
 
 
-
-
-
-'''在地图上显示各自的位置  Creat a map'''
+'''在地图上显示各自的位置    Show them in the map(not good as Google map)'''
 
 cities={"Beijing": (116.4074, 39.9042),
     "Shijiazhuang": (114.5149, 38.0428),
@@ -269,46 +260,66 @@ def calc_rain_features(df, city_name):
     rain_peak=rain_peak[['Year', 'Month']].rename(columns={'Month': 'Peak_Month'})
 
     # 合并结果
-    result = pd.merge(annual_prcp, rain_peak, on='Year', how='inner')
+    result=pd.merge(annual_prcp, rain_peak, on='Year', how='inner')
     result['City'] = city_name
     return result
 
 
-'''三个城市数据  process the data'''
+'''三个城市数据'''
 df_beijing=calc_rain_features(EVS1, 'Beijing')
-df_shijiazhuang = calc_rain_features(EVS2, 'Shijiazhuang')
+df_shijiazhuang=calc_rain_features(EVS2, 'Shijiazhuang')
 df_chengde=calc_rain_features(EVS3, 'Chengde')
 
 '''合并'''
 combined=pd.concat([df_beijing, df_shijiazhuang, df_chengde], ignore_index=True)
 
 
-'''年总降水量趋势图  Annual total precipitation changing trend'''
+'''年总降水量趋势图 Annual Average precipitation Trend(use in the poster)'''
+
 plt.figure(figsize=(10,6))
 for city, color in zip(['Beijing', 'Shijiazhuang', 'Chengde'], ['green','red','blue']):
-    subset=combined[combined['City']==city]
-    plt.plot(subset['Year'], subset['Total_PRCP'], marker='o', label=city, color=color)
+    subset = combined[combined['City']==city]
     
-    slope, intercept, r, p, se = linregress(subset['Year'], subset['Total_PRCP'])
-    plt.plot(subset['Year'], intercept + slope*subset['Year'], color=color, linestyle='--')
+    plt.plot(
+        subset['Year'], subset['Total_PRCP'], 
+        marker='o', 
+        markersize=4,        
+        alpha=0.8,         
+        linewidth=2,        
+        label=city, 
+        color=color)
+    
+    slope, intercept, r, p, se=linregress(subset['Year'], subset['Total_PRCP'])
+    plt.plot(
+        subset['Year'], 
+        intercept+slope * subset['Year'], 
+        color=color, 
+        linestyle='--', 
+        linewidth=2)
 
-plt.title("Annual Total Precipitation Trend (1951–2025)")
-plt.xlabel("Year")
-plt.ylabel("Total Precipitation (mm)")
-plt.legend()
+
+plt.title("Annual Total Precipitation Trend (1951–2025)", fontsize=18)
+plt.xlabel("Year", fontsize=14)
+plt.ylabel("Total Precipitation (mm)", fontsize=14)
+plt.legend(fontsize=12)
 plt.grid(True, linestyle='--', alpha=0.6)
 plt.tight_layout()
 plt.show()
 
 
-'''峰值月份变化趋势 Peak value changing trend'''
+
+
+
+
+
+'''峰值月份变化趋势图     暂不使用/not decide to use'''
 plt.figure(figsize=(10,6))
 for city, color in zip(['Beijing', 'Shijiazhuang', 'Chengde'], ['green','red','blue']):
     subset=combined[combined['City']==city]
     plt.plot(subset['Year'], subset['Peak_Month'], marker='o', label=city, color=color)
     
-    slope, intercept, r, p, se = linregress(subset['Year'], subset['Peak_Month'])
-    plt.plot(subset['Year'], intercept + slope*subset['Year'], color=color, linestyle='--')
+    slope, intercept, r, p, se=linregress(subset['Year'], subset['Peak_Month'])
+    plt.plot(subset['Year'], intercept+slope*subset['Year'], color=color, linestyle='--')
 
 plt.title("Month of Maximum Rainfall Shift (1951–2025)")
 plt.xlabel("Year")
@@ -317,5 +328,3 @@ plt.legend()
 plt.grid(True, linestyle='--', alpha=0.6)
 plt.tight_layout()
 plt.show()
-
-
