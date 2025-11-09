@@ -26,7 +26,6 @@ def descriptive_stats(df):
 stats, cleaned_data = descriptive_stats(PART2)
 print(stats)
 
-
 clean_data=cleaned_data.dropna(subset=['metANN'])
 
 
