@@ -6,7 +6,7 @@ from scipy.stats import linregress
 import os
 
 
-#Functions 
+'''Functions'''
 
 def diagnose_precipitation_data(dataarray, region_name):
     """Diagnose precipitation data characteristics"""
@@ -88,6 +88,7 @@ def calculate_decadal_averages(annual_data,start_year=1960,end_year=2020):
     return decades, decadal_means
 
 
+'''set the path'''
 
 PATH_NORTH="C:\\Users\\zheng\\Desktop\\EV228\\9975c00545ab96ba4dd840ad53ea2934.nc"
 PATH_CENTRAL="C:\\Users\\zheng\\Desktop\\EV228\\1943052617f20d9e8ad93b99d7e4c322.nc"
@@ -200,13 +201,13 @@ slope_n_smooth, intercept_n_smooth, p_n_smooth, r2_n_smooth, trend_n_smooth = ca
 slope_c_smooth, intercept_c_smooth, p_c_smooth, r2_c_smooth, trend_c_smooth = calculate_trend(years_smooth[~np.isnan(central_smooth.values)], central_smooth.values[~np.isnan(central_smooth.values)])
 
 ax2.plot(north_smooth.valid_time, north_smooth, color='#0072B2', linewidth=2, label='Northern China (12-month moving avg)')
-ax2.plot(central_smooth.valid_time, central_smooth, color='#E69F00', linewidth=2, label='Central China (12-month moving avg)')
+ax2.plot(central_smooth.valid_time, central_smooth, color="#E69D00FF", linewidth=2, label='Central China (12-month moving avg)')
 
 trend_line_n_smooth = intercept_n_smooth + slope_n_smooth * years_smooth
 trend_line_c_smooth = intercept_c_smooth + slope_c_smooth * years_smooth
 
 ax2.plot(north_smooth.valid_time, trend_line_n_smooth, color='#0072B2', linestyle='--', linewidth=1.5, alpha=0.8, label=f'N. China trend: {slope_n_smooth:.3f} mm/yr')
-ax2.plot(central_smooth.valid_time, trend_line_c_smooth, color='#E69F00', linestyle='--', linewidth=1.5, alpha=0.8,label=f'C. China trend: {slope_c_smooth:.3f} mm/yr')
+ax2.plot(central_smooth.valid_time, trend_line_c_smooth, color='#E69F00FF', linestyle='--', linewidth=1.5, alpha=0.8,label=f'C. China trend: {slope_c_smooth:.3f} mm/yr')
 
 ax2.set_ylabel('Precipitation (mm/month)', fontsize=12)
 ax2.set_title('Smoothed Precipitation (12-month moving average)', fontsize=14, fontweight='bold')
