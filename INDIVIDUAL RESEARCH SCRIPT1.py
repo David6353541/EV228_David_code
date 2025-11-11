@@ -69,21 +69,21 @@ def convert_era5_monthly_precipitation(monthly_data, region_name):
     return monthly_total_mm
 
 def calculate_spatial_mean(data_array):
-    return data_array.mean(dim=["latitude", "longitude"])
+    return data_array.mean(dim=["latitude","longitude"])
 
 def calculate_trend(years, values):
-    slope, intercept, r_value, p_value, std_err=linregress(years, values)
+    slope, intercept, r_value, p_value,std_err=linregress(years, values)
     trend_line=intercept + slope * years
     return slope, intercept, p_value, r_value**2, trend_line
 
-def calculate_moving_average(data, window=12):
-    return data.rolling(valid_time=window, center=True).mean()
+def calculate_moving_average(data,window=12):
+    return data.rolling(valid_time=window,center=True).mean()
 
-def calculate_decadal_averages(annual_data, start_year=1960, end_year=2020):
-    decades = range(start_year, end_year, 10)
-    decadal_means = []
+def calculate_decadal_averages(annual_data,start_year=1960,end_year=2020):
+    decades=range(start_year,end_year, 10)
+    decadal_means=[]
     for year in decades:
-        decade_data = annual_data.sel(valid_time=slice(f"{year}-01-01", f"{year+9}-12-31"))
+        decade_data=annual_data.sel(valid_time=slice(f"{year}-01-01",f"{year+9}-12-31"))
         decadal_means.append(decade_data.mean().values)
     return decades, decadal_means
 
@@ -98,8 +98,8 @@ ds_north=xr.open_dataset(PATH_NORTH)
 ds_central=xr.open_dataset(PATH_CENTRAL)
 
 #show the variables
-var_north = list(ds_north.data_vars)[0]
-var_central = list(ds_central.data_vars)[0]
+var_north=list(ds_north.data_vars)[0]
+var_central=list(ds_central.data_vars)[0]
 print(f"Variables found: North - {var_north}, Central - {var_central}")
 
 print(f"\nNorthern data attributes:")
@@ -131,7 +131,7 @@ precip_north_ts=calculate_spatial_mean(precip_north_monthly)
 precip_central_ts=calculate_spatial_mean(precip_central_monthly)
 
 # Check the data another time after convert the unit just in case
-print(f"\n" + "="*60)
+print(f"\n"+"="*60)
 print("="*60)
 print(f"Northern China monthly mean:{precip_north_ts.mean().values:.1f} mm/month")
 print(f"Central China monthly mean:{precip_central_ts.mean().values:.1f} mm/month")
@@ -179,36 +179,47 @@ plt.style.use('default')
 
 
 # Figure(s)
-fig,(ax1,ax2)=plt.subplots(2,1,figsize=(14,10))
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10))
 
-ax1.plot(precip_north_ts.valid_time,precip_north_ts, color='#1f77b4',linewidth=0.8,alpha=0.7,label='Northern China')
-ax1.plot(precip_central_ts.valid_time,precip_central_ts, color='#ff7f0e',linewidth=0.8,alpha=0.7,label='Central China')
-ax1.set_ylabel('Precipitation (mm/month)',fontsize=12)
-ax1.set_title('Monthly Precipitation (1960–2025, ERA5)',fontsize=14,fontweight='bold')
-ax1.grid(True,linestyle='--',alpha=0.3)
-ax1.legend(loc='upper right',fontsize=10)
-ax1.set_xticks(pd.date_range(start='1960-01-01',end='2025-01-01',freq='10YS'))
-ax1.set_xticklabels(['1960','1970','1980','1990','2000','2010','2020'],fontsize=10)
+ax1.plot(precip_north_ts.valid_time, precip_north_ts, color='#0072B2', linewidth=0.8, alpha=0.7, label='Northern China')
+ax1.plot(precip_central_ts.valid_time, precip_central_ts, color='#E69F00', linewidth=0.8, alpha=0.7, label='Central China')
+ax1.set_ylabel('Precipitation (mm/month)', fontsize=12)
+ax1.set_title('Monthly Precipitation (1960–2025, ERA5)', fontsize=14, fontweight='bold')
+ax1.grid(True, linestyle='--', alpha=0.3)
+ax1.legend(loc='upper right', fontsize=10)
+ax1.set_xticks(pd.date_range(start='1960-01-01', end='2025-01-01', freq='10YS'))
+ax1.set_xticklabels(['1960', '1970', '1980', '1990', '2000', '2010', '2020'], fontsize=10)
 ax1.set_xlim(pd.Timestamp('1960-01-01'), pd.Timestamp('2025-12-31'))
-ax1.text(0.02,0.95,'Northern China (42-36°N, 106-118°E)',transform=ax1.transAxes,fontsize=10,verticalalignment='top',bbox=dict(boxstyle='round',facecolor='white',alpha=0.8))
-ax1.text(0.02,0.85,'Central China (36-27°N, 105-118°E)',transform=ax1.transAxes,fontsize=10,verticalalignment='top',bbox=dict(boxstyle='round',facecolor='white',alpha=0.8))
+ax1.text(0.02, 0.95, 'Northern China (42-36°N, 106-118°E)', transform=ax1.transAxes, fontsize=10, verticalalignment='top',bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+ax1.text(0.02, 0.85, 'Central China (36-27°N, 105-118°E)', transform=ax1.transAxes, fontsize=10, verticalalignment='top',bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
 
+north_smooth = calculate_moving_average(precip_north_ts)
+central_smooth = calculate_moving_average(precip_central_ts)
+years_smooth = pd.to_datetime(north_smooth.valid_time.values).year
+slope_n_smooth, intercept_n_smooth, p_n_smooth, r2_n_smooth, trend_n_smooth = calculate_trend(years_smooth[~np.isnan(north_smooth.values)], north_smooth.values[~np.isnan(north_smooth.values)])
+slope_c_smooth, intercept_c_smooth, p_c_smooth, r2_c_smooth, trend_c_smooth = calculate_trend(years_smooth[~np.isnan(central_smooth.values)], central_smooth.values[~np.isnan(central_smooth.values)])
 
-north_smooth=calculate_moving_average(precip_north_ts)
-central_smooth=calculate_moving_average(precip_central_ts)
-ax2.plot(north_smooth.valid_time,north_smooth,color='#1f77b4',linewidth=2,label='Northern China (12-month moving avg)')
-ax2.plot(central_smooth.valid_time,central_smooth,color='#ff7f0e',linewidth=2,label='Central China (12-month moving avg)')
-ax2.set_ylabel('Precipitation (mm/month)',fontsize=12)
-ax2.set_title('Smoothed Precipitation (12-month moving average)',fontsize=14,fontweight='bold')
-ax2.grid(True,linestyle='--',alpha=0.3)
-ax2.legend(loc='upper right',fontsize=10)
-ax2.set_xticks(pd.date_range(start='1960-01-01',end='2025-01-01',freq='10YS'))
-ax2.set_xticklabels(['1960','1970','1980','1990','2000','2010','2020'],fontsize=10)
-ax2.set_xlim(pd.Timestamp('1960-01-01'),pd.Timestamp('2025-12-31'))
+ax2.plot(north_smooth.valid_time, north_smooth, color='#0072B2', linewidth=2, label='Northern China (12-month moving avg)')
+ax2.plot(central_smooth.valid_time, central_smooth, color='#E69F00', linewidth=2, label='Central China (12-month moving avg)')
+
+trend_line_n_smooth = intercept_n_smooth + slope_n_smooth * years_smooth
+trend_line_c_smooth = intercept_c_smooth + slope_c_smooth * years_smooth
+
+ax2.plot(north_smooth.valid_time, trend_line_n_smooth, color='#0072B2', linestyle='--', linewidth=1.5, alpha=0.8, label=f'N. China trend: {slope_n_smooth:.3f} mm/yr')
+ax2.plot(central_smooth.valid_time, trend_line_c_smooth, color='#E69F00', linestyle='--', linewidth=1.5, alpha=0.8,label=f'C. China trend: {slope_c_smooth:.3f} mm/yr')
+
+ax2.set_ylabel('Precipitation (mm/month)', fontsize=12)
+ax2.set_title('Smoothed Precipitation (12-month moving average)', fontsize=14, fontweight='bold')
+ax2.grid(True, linestyle='--', alpha=0.3)
+ax2.legend(loc='upper right', fontsize=10)
+ax2.set_xticks(pd.date_range(start='1960-01-01', end='2025-01-01', freq='10YS'))
+ax2.set_xticklabels(['1960', '1970', '1980', '1990', '2000', '2010', '2020'], fontsize=10)
+ax2.set_xlim(pd.Timestamp('1960-01-01'), pd.Timestamp('2025-12-31'))
 
 plt.tight_layout()
-plt.savefig("C:\\Users\\zheng\\Desktop\\EV228\\ERA5_Monthly_Precipitation_CORRECTED.png",dpi=600,bbox_inches='tight',facecolor='white')
+plt.savefig("C:\\Users\\zheng\\Desktop\\EV228\\ERA5_Monthly_Precipitation_CORRECTED.png", dpi=600, bbox_inches='tight', facecolor='white')
 plt.show()
+
 
 
 # show the Statistical Analysis Events and Results
@@ -256,5 +267,8 @@ if slope_n > slope_c:
     elif slope_n > slope_c:
         print("Northern region shows relatively less decrease")
         print("Partially supports northward shift hypothesis")
+    elif slope_n < slope_c:
+        print("Central region shows relatively less decrease")
+        printz("It can't support northward shift hypothesis")
 else:
     print("Trend pattern does not support northward shift hypothesis")
